@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
-import { getLatestListings } from "@/lib/data";
+
 import HeroSearch from "@/components/HeroSearch";
 import SeoFaq from "@/components/SeoFaq";
 import { supabase } from "@/lib/supabaseClient";

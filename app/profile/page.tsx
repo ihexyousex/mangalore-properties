@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useUser } from "@/components/UserProvider";
 import PropertyCard from "@/components/PropertyCard";
-import { PROJECTS, RESALE_PROPERTIES, COMMERCIAL_PROPERTIES, LAND_PROPERTIES } from "@/lib/data";
+import { supabase } from "@/lib/supabaseClient";
 import { LogOut } from "lucide-react";
 
 export default function ProfilePage() {
@@ -22,45 +22,25 @@ export default function ProfilePage() {
         }
 
         // Match favorites with local data
-        const loadFavorites = () => {
+        const loadFavorites = async () => {
             setIsLoading(true);
-            const loadedProps: any[] = [];
+            if (favorites.length === 0) {
+                setSavedProperties([]);
+                setIsLoading(false);
+                return;
+            }
 
-            favorites.forEach(fav => {
-                let foundProp = null;
-                const id = fav.id;
+            const ids = favorites.map(f => f.id);
+            const { data, error } = await supabase
+                .from('projects')
+                .select('*')
+                .in('id', ids);
 
-                // Search in appropriate array based on type
-                // Note: In data.ts, types are lowercase 'ongoing'/'upcoming' for projects
-                // But we might store 'Project' in DB. 
-                // Let's check all arrays to be safe or use the type hint.
-
-                // Try Projects (Numeric IDs)
-                if (!foundProp) {
-                    foundProp = PROJECTS.find(p => p.id.toString() === id);
-                }
-
-                // Try Resale
-                if (!foundProp) {
-                    foundProp = RESALE_PROPERTIES.find(p => p.id === id);
-                }
-
-                // Try Commercial
-                if (!foundProp) {
-                    foundProp = COMMERCIAL_PROPERTIES.find(p => p.id === id);
-                }
-
-                // Try Land
-                if (!foundProp) {
-                    foundProp = LAND_PROPERTIES.find(p => p.id === id);
-                }
-
-                if (foundProp) {
-                    loadedProps.push(foundProp);
-                }
-            });
-
-            setSavedProperties(loadedProps);
+            if (error) {
+                console.error("Error fetching favorites:", error);
+            } else {
+                setSavedProperties(data || []);
+            }
             setIsLoading(false);
         };
 
