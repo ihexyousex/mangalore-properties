@@ -1,5 +1,5 @@
 "use client";
-export const dynamic = 'force-dynamic';
+
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -8,6 +8,8 @@ import AdvancedFilter from "@/components/AdvancedFilter";
 import { PlusCircle, Search, Edit, Trash2, Eye } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+
+export const dynamic = 'force-dynamic';
 
 export default function AdminProjectsPage() {
     const [projects, setProjects] = useState<any[]>([]);
