@@ -23,6 +23,7 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
+// User Context Provider
 export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User>(null);
     const [favorites, setFavorites] = useState<{ id: string; type: string }[]>([]);

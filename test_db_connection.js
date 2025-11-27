@@ -1,15 +1,22 @@
 const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: '.env.local' });
 
-async function testConnection(port) {
-    const connectionString = `postgresql://postgres:postgres@localhost:${port}/postgres`;
+async function testConnection() {
+    const connectionString = process.env.DATABASE_URL;
+
+    if (!connectionString) {
+        console.error('DATABASE_URL is not defined in .env.local');
+        return false;
+    }
+
     const client = new Client({ connectionString });
 
     try {
-        console.log(`Testing connection to port ${port}...`);
+        console.log(`Testing connection to database...`);
         await client.connect();
-        console.log(`Successfully connected to port ${port}`);
+        console.log(`Successfully connected to database!`);
 
         // Try to run migration if connected
         const sqlPath = path.join(__dirname, 'add_property_details.sql');
@@ -25,23 +32,13 @@ async function testConnection(port) {
         await client.end();
         return true;
     } catch (err) {
-        console.log(`Failed to connect to port ${port}: ${err.message}`);
+        console.log(`Failed to connect: ${err.message}`);
         return false;
     }
 }
 
 async function run() {
-    // Try 54322 first (Supabase local default sometimes)
-    let success = await testConnection(54322);
-
-    // If failed, try 5432 (Standard Postgres)
-    if (!success) {
-        success = await testConnection(5432);
-    }
-
-    if (!success) {
-        console.error('Could not connect to database on port 54322 or 5432.');
-    }
+    await testConnection();
 }
 
 run();

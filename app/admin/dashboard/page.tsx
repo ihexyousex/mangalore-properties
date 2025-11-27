@@ -67,9 +67,13 @@ export default function AdminDashboardPage() {
     const recentLeads = leads.slice(0, 5);
 
     return (
-        <div className="flex min-h-screen bg-dark-bg text-white font-sans">
-            <AdminSidebar />
+        <div className="flex min-h-screen bg-neutral-950 text-white font-sans">
+            {/* Sidebar - Fixed Width */}
+            <div className="w-64 fixed inset-y-0 z-50">
+                <AdminSidebar />
+            </div>
 
+            {/* Main Content - Offset by Sidebar Width */}
             <main className="flex-1 ml-64 p-8">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
