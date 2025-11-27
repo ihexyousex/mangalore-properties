@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, X } from "lucide-react";
 import { useUser } from "./UserProvider";
-import { PROJECTS } from "@/lib/data";
+
 
 export default function CompareBar() {
     const { compareList, toggleCompare } = useUser();

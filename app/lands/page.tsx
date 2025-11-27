@@ -4,7 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { MapPin, Ruler, Trees, Navigation, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import { LAND_PROPERTIES } from "@/lib/data";
+
 
 import { supabase } from "@/lib/supabaseClient";
 import { useState, useEffect } from "react";

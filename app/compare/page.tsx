@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, X, MapPin, ArrowLeft, Phone, Plus, RefreshCw, Calendar, Ruler } from "lucide-react";
 import { useUser } from "@/components/UserProvider";
-import { PROJECTS, RESALE_PROPERTIES, COMMERCIAL_PROPERTIES, LAND_PROPERTIES } from "@/lib/data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProjectSelectorModal from "@/components/ProjectSelectorModal";
 import LeadFormModal from "@/components/LeadFormModal";
 import clsx from "clsx";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function ComparePage() {
     const { compareList, toggleCompare } = useUser();
@@ -16,24 +16,51 @@ export default function ComparePage() {
     const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
     const [selectedForLead, setSelectedForLead] = useState("");
     const [swapTargetId, setSwapTargetId] = useState<number | string | null>(null);
+    const [fetchedProjects, setFetchedProjects] = useState<any[]>([]);
 
-    // Combine all properties for lookup
-    const ALL_PROPERTIES = [
-        ...PROJECTS,
-        ...RESALE_PROPERTIES.map(p => ({ ...p, name: p.title, status: "Resale" })),
-        ...COMMERCIAL_PROPERTIES.map(p => ({ ...p, name: p.title, status: "Commercial" })),
-        ...LAND_PROPERTIES.map(p => ({ ...p, name: p.title, status: "Land" }))
-    ];
+    // Fetch dynamic projects from Supabase
+    useEffect(() => {
+        const fetchProjects = async () => {
+            if (compareList.length === 0) {
+                setFetchedProjects([]);
+                return;
+            }
 
-    const selectedProjects = ALL_PROPERTIES.filter((p) => compareList.includes(p.id));
+            const { data } = await supabase
+                .from('projects')
+                .select('*')
+                .in('id', compareList);
+
+            if (data) {
+                const mapped = data.map((p: any) => ({
+                    id: p.id,
+                    name: p.name || p.title,
+                    location: p.location,
+                    price: p.price || p.price_text || "Price on Request",
+                    image: p.image || p.cover_image_url || "https://images.unsplash.com/photo-1600596542815-27bfefd0c3c6?q=80&w=1000",
+                    status: p.status || "Ongoing",
+                    type: p.type || "Project",
+                    amenities: p.amenities?.map((a: string) => ({ name: a })) || [],
+                    area: p.configuration || p.size || "-",
+                    handover: p.possession_date || "Upcoming"
+                }));
+                setFetchedProjects(mapped);
+            }
+        };
+
+        fetchProjects();
+    }, [compareList]);
+
+    const selectedProjects = fetchedProjects;
 
     // Helper to parse price string to number for comparison
     const parsePrice = (priceStr: string) => {
+        if (!priceStr) return 0;
         const match = priceStr.match(/(\d+)/);
         return match ? parseInt(match[0]) : 0;
     };
 
-    const lowestPrice = Math.min(...selectedProjects.map(p => parsePrice(p.price)));
+    const lowestPrice = selectedProjects.length > 0 ? Math.min(...selectedProjects.map(p => parsePrice(p.price))) : 0;
 
     const handleAddProject = (projectId: number | string) => {
         if (swapTargetId) {

@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic';
 function AdminProjectsContent() {
     const [projects, setProjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -20,6 +21,7 @@ function AdminProjectsContent() {
 
     const fetchProjects = async () => {
         setLoading(true);
+        setSelectedIds([]); // Reset selection on refetch
 
         // Parse filters from URL
         const search = searchParams.get("search") || "";
@@ -93,6 +95,36 @@ function AdminProjectsContent() {
         }
     };
 
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+
+        if (confirm(`Are you sure you want to delete ${selectedIds.length} selected projects?`)) {
+            const { error } = await supabase.from("projects").delete().in("id", selectedIds);
+            if (error) {
+                alert("Error deleting projects");
+                console.error(error);
+            } else {
+                fetchProjects();
+            }
+        }
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === projects.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(projects.map(p => p.id));
+        }
+    };
+
+    const toggleSelect = (id: number) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(sid => sid !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
     return (
         <div className="p-4 md:p-8">
             <div className="flex justify-between items-center mb-8">
@@ -100,13 +132,24 @@ function AdminProjectsContent() {
                     <h1 className="text-3xl font-serif font-bold text-white">Projects</h1>
                     <p className="text-white/50">Manage your property listings.</p>
                 </div>
-                <Link
-                    href="/admin/projects/new"
-                    className="flex items-center gap-2 bg-gold text-dark-bg px-4 py-2 rounded-lg font-bold hover:bg-amber-400 transition-colors"
-                >
-                    <PlusCircle size={20} />
-                    Add New Property
-                </Link>
+                <div className="flex items-center gap-4">
+                    {selectedIds.length > 0 && (
+                        <button
+                            onClick={handleBulkDelete}
+                            className="flex items-center gap-2 bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-lg font-bold hover:bg-red-500/20 transition-colors"
+                        >
+                            <Trash2 size={20} />
+                            Delete Selected ({selectedIds.length})
+                        </button>
+                    )}
+                    <Link
+                        href="/admin/projects/new"
+                        className="flex items-center gap-2 bg-gold text-dark-bg px-4 py-2 rounded-lg font-bold hover:bg-amber-400 transition-colors"
+                    >
+                        <PlusCircle size={20} />
+                        Add New Property
+                    </Link>
+                </div>
             </div>
 
             {/* Advanced Filter */}
@@ -118,6 +161,14 @@ function AdminProjectsContent() {
                 <table className="w-full text-left">
                     <thead>
                         <tr className="bg-white/5 border-b border-white/10 text-xs text-white/50 uppercase tracking-wider">
+                            <th className="p-4 w-10">
+                                <input
+                                    type="checkbox"
+                                    checked={projects.length > 0 && selectedIds.length === projects.length}
+                                    onChange={toggleSelectAll}
+                                    className="rounded border-white/20 bg-white/5 text-gold focus:ring-gold"
+                                />
+                            </th>
                             <th className="p-4">Property</th>
                             <th className="p-4">Type</th>
                             <th className="p-4">Price</th>
@@ -128,15 +179,23 @@ function AdminProjectsContent() {
                     <tbody className="divide-y divide-white/5">
                         {loading ? (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-white/40">Loading projects...</td>
+                                <td colSpan={6} className="p-8 text-center text-white/40">Loading projects...</td>
                             </tr>
                         ) : projects.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="p-8 text-center text-white/40">No projects found matching your filters.</td>
+                                <td colSpan={6} className="p-8 text-center text-white/40">No projects found matching your filters.</td>
                             </tr>
                         ) : (
                             projects.map((project) => (
                                 <tr key={project.id} className="hover:bg-white/5 transition-colors">
+                                    <td className="p-4">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedIds.includes(project.id)}
+                                            onChange={() => toggleSelect(project.id)}
+                                            className="rounded border-white/20 bg-white/5 text-gold focus:ring-gold"
+                                        />
+                                    </td>
                                     <td className="p-4">
                                         <div className="font-medium text-white">{project.name}</div>
                                         <div className="text-xs text-white/40">{project.location}</div>

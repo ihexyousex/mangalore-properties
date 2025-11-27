@@ -6,7 +6,7 @@ import { Building2, MapPin, ArrowUpRight, Briefcase, Store, LayoutGrid, CheckSqu
 import Image from "next/image";
 import Link from "next/link";
 
-import { COMMERCIAL_PROPERTIES } from "@/lib/data";
+
 import FavoriteButton from "@/components/FavoriteButton";
 import { useUser } from "@/components/UserProvider";
 

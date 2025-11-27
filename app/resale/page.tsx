@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { MapPin, BedDouble, Bath, Square, Phone, CheckCircle2, CheckSquare, Square as SquareIcon } from "lucide-react";
 import Image from "next/image";
 
-import { RESALE_PROPERTIES } from "@/lib/data";
+
 import FavoriteButton from "@/components/FavoriteButton";
 import { useUser } from "@/components/UserProvider";
 
