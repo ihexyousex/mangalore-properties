@@ -1,7 +1,6 @@
 "use client";
 
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdvancedFilter from "@/components/AdvancedFilter";
@@ -11,7 +10,7 @@ import { useSearchParams } from "next/navigation";
 
 export const dynamic = 'force-dynamic';
 
-export default function AdminProjectsPage() {
+function AdminProjectsContent() {
     const [projects, setProjects] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
@@ -180,5 +179,13 @@ export default function AdminProjectsPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+export default function AdminProjectsPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-dark-bg text-white flex items-center justify-center">Loading...</div>}>
+            <AdminProjectsContent />
+        </Suspense>
     );
 }
