@@ -56,7 +56,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
                     .eq('user_id', user.phone);
 
                 if (data) {
-                    setFavorites(data.map(f => ({ id: f.property_id, type: f.property_type })));
+                    setFavorites(data.map((f: any) => ({ id: f.property_id, type: f.property_type })));
                 } else if (error) {
                     console.error("Error fetching favorites:", error);
                 }
