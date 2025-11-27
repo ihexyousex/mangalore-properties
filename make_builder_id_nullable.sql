@@ -1,0 +1,1 @@
+ALTER TABLE projects ALTER COLUMN builder_id DROP NOT NULL;
