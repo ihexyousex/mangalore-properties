@@ -52,7 +52,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
         .limit(3);
 
     // Calculate Distances if coordinates are available
-    let distances = [];
+    let distances: { name: string; distance: number; duration: number }[] = [];
     if (project.latitude && project.longitude) {
         try {
             distances = await getDistancesFromLandmarks(project.latitude, project.longitude);
