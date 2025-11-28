@@ -92,6 +92,7 @@ export default async function Home({
             src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2000"
             alt="Luxury Coastal Home"
             fill
+            sizes="100vw"
             className="object-cover"
             priority
           />
@@ -128,6 +129,7 @@ export default async function Home({
                 src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=1000"
                 alt="New Launches"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -145,6 +147,7 @@ export default async function Home({
                 src="https://images.unsplash.com/photo-1600596542815-27bfefd0c3c6?q=80&w=1000"
                 alt="Resale Properties"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -162,6 +165,7 @@ export default async function Home({
                 src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000"
                 alt="Commercial Properties"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -179,6 +183,7 @@ export default async function Home({
                 src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000"
                 alt="Premium Lands"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
@@ -196,6 +201,7 @@ export default async function Home({
                 src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=2070"
                 alt="Rent Properties"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover opacity-60 group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />

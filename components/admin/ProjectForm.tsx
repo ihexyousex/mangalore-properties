@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { Loader2, Upload, X, CheckCircle, Image as ImageIcon } from "lucide-react";
 import clsx from "clsx";
 import { useLoadScript, Autocomplete } from "@react-google-maps/api";
+import LocationPicker from "./LocationPicker";
 
 type Builder = {
     id: number;
@@ -72,6 +73,12 @@ export default function ProjectForm() {
         facing: "",
         price_per_sqft: "",
         additional_rooms: [] as string[],
+        // Location Data
+        latitude: null as number | null,
+        longitude: null as number | null,
+        pincode: "",
+        area: "",
+        landmarks: [] as string[],
     });
 
     // ... (existing code)
@@ -202,7 +209,7 @@ export default function ProjectForm() {
             console.log("Price:", finalPriceText);
 
             //1. Upload Cover Image (if exists)
-            let coverImageUrl = "https://ik.imagekit.io/dydioygv9/default-property.jpg"; // Default placeholder
+            let coverImageUrl = "https://images.unsplash.com/photo-1600596542815-27bfefd0c3c6?q=80&w=1000"; // Default placeholder
             if (coverImage) {
                 console.log("Uploading cover image...");
                 coverImageUrl = await uploadImage(coverImage);
@@ -308,6 +315,12 @@ export default function ProjectForm() {
                 facing: formData.facing || null,
                 price_per_sqft: formData.price_per_sqft ? parseFloat(formData.price_per_sqft) : null,
                 additional_rooms: formData.additional_rooms || [],
+                // Advanced Location Data
+                latitude: (formData as any).latitude || null,
+                longitude: (formData as any).longitude || null,
+                pincode: (formData as any).pincode || null,
+                area: (formData as any).area || null,
+                landmarks: (formData as any).landmarks || [],
             };
 
             // Call API route with authentication
@@ -457,66 +470,30 @@ export default function ProjectForm() {
                         </div>
                     </div>
 
+                    {/* Advanced Location Picker */}
                     <div className="space-y-3">
-                        <label className="text-base font-medium text-gray-200">Location <span className="text-red-500">*</span></label>
-                        {isLoaded ? (
-                            <Autocomplete
-                                onLoad={(autocomplete) => {
-                                    autocompleteRef.current = autocomplete;
-                                }}
-                                onPlaceChanged={() => {
-                                    if (autocompleteRef.current) {
-                                        const place = autocompleteRef.current.getPlace();
-                                        if (place.geometry && place.geometry.location) {
-                                            const locationName = place.formatted_address || place.name || "";
-                                            const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${place.place_id}`;
-
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                location: locationName,
-                                                map_url: mapUrl
-                                            }));
-                                        }
+                        <label className="text-base font-medium text-gray-200">Location & Map <span className="text-red-500">*</span></label>
+                        <LocationPicker
+                            isLoaded={isLoaded}
+                            initialLocation={formData.location}
+                            initialLat={(formData as any).latitude}
+                            initialLng={(formData as any).longitude}
+                            onLocationSelect={(data) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    location: data.address,
+                                    map_url: data.map_url,
+                                    // Store additional location data
+                                    ...{
+                                        latitude: data.latitude,
+                                        longitude: data.longitude,
+                                        area: data.area,
+                                        pincode: data.pincode,
+                                        landmarks: data.landmarks || []
                                     }
-                                }}
-                            >
-                                <input
-                                    required
-                                    name="location"
-                                    value={formData.location}
-                                    onChange={handleChange}
-                                    placeholder="Search location..."
-                                    className="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                                />
-                            </Autocomplete>
-                        ) : (
-                            <input
-                                required
-                                name="location"
-                                value={formData.location}
-                                onChange={handleChange}
-                                placeholder="e.g. Kadri, Mangalore"
-                                className="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white text-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                            />
-                        )}
-
-                        {/* Live Map Preview */}
-                        {formData.map_url && (
-                            <div className="mt-4 w-full h-[300px] rounded-xl overflow-hidden border border-white/10 shadow-lg relative group">
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    frameBorder="0"
-                                    style={{ border: 0 }}
-                                    src={formData.map_url}
-                                    allowFullScreen
-                                    className="filter grayscale-[20%] group-hover:grayscale-0 transition-all duration-500"
-                                ></iframe>
-                                <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-xs text-gold border border-gold/20">
-                                    Live Preview
-                                </div>
-                            </div>
-                        )}
+                                }));
+                            }}
+                        />
                     </div>
 
                     <div className="space-y-3">

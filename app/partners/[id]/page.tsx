@@ -30,10 +30,11 @@ export default function BuilderDetailPage() {
                 setBuilder(builderData);
 
                 // Fetch Builder's Projects
+                // Note: Projects table uses 'builder' string column, not 'builder_id' FK currently
                 const { data: projectsData, error: projectsError } = await supabase
                     .from('projects')
                     .select('*')
-                    .eq('builder_id', id);
+                    .eq('builder', builderData.name);
 
                 if (projectsData) {
                     setProjects(projectsData);

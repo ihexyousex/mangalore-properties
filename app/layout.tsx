@@ -8,6 +8,8 @@ import CompareBar from "@/components/CompareBar";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 import Footer from "@/components/Footer";
 import MobileMenu from "@/components/MobileMenu";
+import { Toaster } from "sonner";
+import GoogleOneTap from "@/components/GoogleOneTap";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -72,6 +74,7 @@ export default function RootLayout({
         className={`${playfair.variable} ${manrope.variable} font-sans antialiased bg-dark-bg text-white`}
       >
         <JsonLd data={jsonLd} />
+        <GoogleOneTap />
         <UserProvider>
           <Navbar />
           {children}
@@ -81,7 +84,9 @@ export default function RootLayout({
           <Footer />
           <MobileMenu />
         </UserProvider>
+        <Toaster position="top-right" theme="dark" richColors />
       </body>
     </html>
   );
 }
+

@@ -1,7 +1,13 @@
 "use client";
 
-import ProjectForm from "@/components/admin/ProjectForm";
+import ListingWizard from "@/components/admin/ListingWizard";
 
 export default function AddPropertyPage() {
-    return <ProjectForm />;
+    return <ListingWizard />;
 }
+
+// Note: The old ProjectForm is still available at @/components/admin/ProjectForm
+// You can switch back by uncommenting below:
+// import ProjectForm from "@/components/admin/ProjectForm";
+// return <ProjectForm />;
+

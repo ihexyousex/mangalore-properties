@@ -44,15 +44,6 @@ export default function PropertyCard({ project }: PropertyCardProps) {
             <Link href={`/projects/${project.id}`} className="flex flex-col h-full">
                 {/* Image Container */}
                 <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
-                        src={project.image}
-                        alt={`${title} in ${project.location}`}
-                        fill
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
                     {/* Status Badge */}
                     <div
                         className={clsx(
@@ -122,7 +113,7 @@ export default function PropertyCard({ project }: PropertyCardProps) {
                         )}
                     </div>
                 </div>
-            </Link>
-        </div>
+            </Link >
+        </div >
     );
 }

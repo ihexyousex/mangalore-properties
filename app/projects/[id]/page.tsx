@@ -85,17 +85,6 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
             {/* Hero Section */}
             <section className="relative h-[60vh] w-full">
-                <Image
-                    src={project.image || "https://images.unsplash.com/photo-1600596542815-27bfefd0c3c6?q=80&w=1000"}
-                    alt={`${project.name} - Luxury Property in ${project.location}`}
-                    fill
-                    placeholder="blur"
-                    blurDataURL={BLUR_DATA_URL}
-                    sizes="100vw"
-                    className="object-cover"
-                    priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-dark-bg/50 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
                     <div className="container mx-auto flex justify-between items-end">

@@ -9,6 +9,7 @@ import clsx from "clsx";
 const menuItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Properties", href: "/admin/projects", icon: Building },
+    { name: "Builders", href: "/admin/builders", icon: Building }, // Reusing Building icon or use HardHat if available
     { name: "Leads", href: "/admin/leads", icon: Users },
     { name: "SEO Tools", href: "/admin/seo", icon: Search },
     { name: "Settings", href: "/admin/settings", icon: Settings },
