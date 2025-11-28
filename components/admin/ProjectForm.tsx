@@ -195,22 +195,20 @@ export default function ProjectForm() {
                 setLoading(false);
                 return;
             }
-            if (!coverImage) {
-                alert("Cover Image is required");
-                setLoading(false);
-                return;
-            }
+            // Cover image is now optional
 
             // Construct price text
             const finalPriceText = `${priceValue} ${priceUnit}`;
             console.log("Price:", finalPriceText);
 
-            // 1. Upload Cover Image (if exists)
-            let coverImageUrl = null;
+            //1. Upload Cover Image (if exists)
+            let coverImageUrl = "https://ik.imagekit.io/dydioygv9/default-property.jpg"; // Default placeholder
             if (coverImage) {
                 console.log("Uploading cover image...");
                 coverImageUrl = await uploadImage(coverImage);
                 console.log("Cover image uploaded:", coverImageUrl);
+            } else {
+                console.log("No cover image provided, using default placeholder");
             }
 
             // 2. Upload Gallery Images
@@ -265,20 +263,24 @@ export default function ProjectForm() {
                 console.log("Assigned Builder ID:", finalBuilderId);
             }
 
-            // 5. Insert into Database
-            console.log("Inserting into database...");
-            const { error } = await supabase.from("projects").insert({
+            // 5. Insert via secure API route
+            console.log("Submitting to API route...");
+
+            // Get auth session token
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error("Not authenticated. Please log in again.");
+            }
+
+            const projectData = {
                 name: formData.title, // Mapped to 'name'
-                slug,
                 builder: finalBuilderId, // Mapped to 'builder'
                 location: formData.location,
                 price: finalPriceText, // Mapped to 'price'
                 status: formData.status,
                 type: formData.category, // Mapped to 'type'
                 sub_category: formData.category === "Rent" ? formData.sub_category : null,
-                video_url: formData.video_url || null,
                 image: coverImageUrl, // Mapped to 'image'
-                gallery_images: galleryImageUrls,
                 amenities: tags,
                 description: formData.description,
                 completion_percentage: formData.completion_percentage,
@@ -306,17 +308,29 @@ export default function ProjectForm() {
                 facing: formData.facing || null,
                 price_per_sqft: formData.price_per_sqft ? parseFloat(formData.price_per_sqft) : null,
                 additional_rooms: formData.additional_rooms || [],
+            };
+
+            // Call API route with authentication
+            const response = await fetch('/api/admin/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify(projectData)
             });
 
-            if (error) {
-                console.error("Supabase Insert Error:", error);
-                throw error;
+            const result = await response.json();
+
+            if (!response.ok) {
+                console.error("API Error:", result.error);
+                throw new Error(result.error || "Failed to create project");
             }
 
-            console.log("Project inserted successfully!");
+            console.log("Project created successfully!", result.data);
             setSuccess(true);
             setTimeout(() => {
-                router.push("/admin");
+                router.push("/admin/dashboard");
             }, 2000);
 
         } catch (error: any) {

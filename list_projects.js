@@ -13,7 +13,7 @@ async function run() {
         console.error('Error fetching projects:', error);
     } else {
         console.log('Projects found:', data.length);
-        data.forEach(p => console.log(`- ${p.title} (${p.category})`));
+        data.forEach(p => console.log(`- ${p.name || p.title} (${p.type || p.category}) - ID: ${p.id}`));
     }
 }
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
+import { createBrowserClient } from "@supabase/auth-helpers-nextjs";
 
 export default function AdminLoginPage() {
     const [email, setEmail] = useState("");
@@ -12,37 +12,60 @@ export default function AdminLoginPage() {
     const [error, setError] = useState("");
     const router = useRouter();
 
+    // Initialize Supabase client for Client Components
+    const supabase = createBrowserClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log("🚀 Starting login process...");
         setLoading(true);
         setError("");
 
         try {
-            // Query Supabase for the admin
-            const { data, error: dbError } = await supabase
-                .from("admins")
-                .select("*")
-                .eq("email", email)
-                .eq("password_hash", password) // Simple check for demo
-                .single();
+            // 1. Sign in
+            const { data, error: signInError } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
 
-            if (dbError || !data) {
-                setError("Invalid email or password");
+            if (signInError) {
+                console.error("❌ Sign in error:", signInError);
+                setError(signInError.message || "Invalid email or password");
                 setLoading(false);
                 return;
             }
 
-            // Login Success
-            localStorage.setItem("admin_auth", "true");
-            localStorage.setItem("admin_role", data.role);
-            localStorage.setItem("admin_name", data.name);
-            localStorage.setItem("admin_email", data.email);
+            console.log("✅ Sign in successful, checking role...");
 
-            router.push("/admin");
+            // 2. Check Role
+            const userRole = data.user?.user_metadata?.role;
+            if (userRole !== 'admin') {
+                console.error("❌ Access denied: Not an admin");
+                setError("Access denied. Admin privileges required.");
+                await supabase.auth.signOut();
+                setLoading(false);
+                return;
+            }
 
-        } catch (err) {
-            console.error("Login error:", err);
-            setError("An unexpected error occurred");
+            console.log("✅ Admin verified, setting storage and redirecting...");
+
+            // 3. Store UI helpers
+            localStorage.setItem("admin_name", data.user?.user_metadata?.name || "Admin");
+            localStorage.setItem("admin_email", data.user?.email || "");
+            localStorage.setItem("admin_role", userRole);
+
+            // 4. Force router refresh to update middleware state
+            router.refresh();
+
+            // 5. Redirect
+            router.push("/admin/dashboard");
+
+        } catch (err: any) {
+            console.error("❌ Unexpected error:", err);
+            setError(err.message || "An unexpected error occurred");
             setLoading(false);
         }
     };
@@ -69,7 +92,7 @@ export default function AdminLoginPage() {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@example.com"
+                            placeholder="admin@mangaloreproperties.in"
                             className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:border-gold/50 focus:outline-none transition-colors"
                             required
                         />
@@ -103,9 +126,8 @@ export default function AdminLoginPage() {
 
                 <div className="mt-6 text-center">
                     <p className="text-xs text-white/30">
-                        Demo Credentials:<br />
-                        Master: admin@mangaloreproperties.in / admin123<br />
-                        Partner: partner@mangaloreproperties.in / sub123
+                        Secure authentication via Supabase Auth<br />
+                        Admin credentials required
                     </p>
                 </div>
             </div>
