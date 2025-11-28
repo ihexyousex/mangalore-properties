@@ -1,76 +1,112 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
-import { useUser } from "./UserProvider";
-import clsx from "clsx";
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface FavoriteButtonProps {
-    propertyId: string | number;
-    propertyType?: string;
+    propertyId: string;
     className?: string;
+    iconSize?: number;
 }
 
-export default function FavoriteButton({ propertyId, propertyType = "Project", className }: FavoriteButtonProps) {
-    const { user, favorites, toggleFavorite, openLoginModal } = useUser();
+export default function FavoriteButton({ propertyId, className = "", iconSize = 20 }: FavoriteButtonProps) {
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [userId, setUserId] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const isFavorite = favorites.some(f => f.id === propertyId.toString());
+    useEffect(() => {
+        // Check if user is logged in
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            setUserId(user.id);
+            checkIfFavorite(user.id);
+        }
 
-    const handleClick = (e: React.MouseEvent) => {
+        // Listen for sign-in events
+        const handleSignIn = (e: CustomEvent) => {
+            setUserId(e.detail.id);
+            checkIfFavorite(e.detail.id);
+        };
+
+        window.addEventListener('user-signed-in', handleSignIn as EventListener);
+        return () => window.removeEventListener('user-signed-in', handleSignIn as EventListener);
+    }, [propertyId]);
+
+    const checkIfFavorite = async (uid: string) => {
+        try {
+            const res = await fetch(`/api/user/favorites?userId=${uid}`);
+            const data = await res.json();
+            if (data.favorites?.includes(propertyId)) {
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error('Error checking favorite:', error);
+        }
+    };
+
+    const toggleFavorite = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!user) {
-            openLoginModal();
+        if (!userId) {
+            toast.error("Please sign in to save favorites");
+            // Optional: Trigger login modal or One Tap prompt
             return;
         }
 
-        toggleFavorite(propertyId, propertyType);
+        // Optimistic update
+        const newState = !isFavorite;
+        setIsFavorite(newState);
+        setIsLoading(true);
+
+        try {
+            const res = await fetch('/api/user/favorites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, propertyId }),
+            });
+
+            if (!res.ok) {
+                throw new Error('Failed to update');
+            }
+
+            toast.success(newState ? "Added to favorites" : "Removed from favorites");
+        } catch (error) {
+            // Revert on error
+            setIsFavorite(!newState);
+            toast.error("Failed to update favorite");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <motion.button
-            onClick={handleClick}
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
-            className={clsx(
-                "p-2.5 rounded-full backdrop-blur-md border transition-all duration-300 group relative overflow-hidden",
-                isFavorite
-                    ? "bg-amber-500/10 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.3)]"
-                    : "bg-black/30 border-white/10 hover:bg-black/50 hover:border-amber-500/30 hover:shadow-[0_0_10px_rgba(245,158,11,0.2)]",
-                className
-            )}
-            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+            whileTap={{ scale: 0.8 }}
+            onClick={toggleFavorite}
+            className={`relative group ${className}`}
+            disabled={isLoading}
         >
+            <Heart
+                size={iconSize}
+                className={`transition-colors duration-300 ${isFavorite
+                        ? "fill-red-500 text-red-500"
+                        : "text-white group-hover:text-red-500"
+                    }`}
+            />
             <AnimatePresence>
-                {isFavorite ? (
+                {isFavorite && (
                     <motion.div
-                        key="filled"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0, opacity: 0, transition: { duration: 0.1 } }}
-                        transition={{ type: "spring", stiffness: 500, damping: 25, mass: 0.5 }}
-                        className="absolute inset-0 flex items-center justify-center"
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1.5, opacity: 0 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 flex items-center justify-center pointer-events-none"
                     >
-                        <Heart
-                            size={20}
-                            className="fill-amber-500 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                        />
-                    </motion.div>
-                ) : (
-                    <motion.div
-                        key="outline"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0, opacity: 0, transition: { duration: 0.1 } }}
-                        transition={{ type: "spring", stiffness: 500, damping: 25, mass: 0.5 }}
-                        className="absolute inset-0 flex items-center justify-center"
-                    >
-                        <Heart
-                            size={20}
-                            className="text-white/80 group-hover:text-amber-400 transition-colors duration-300"
-                        />
+                        <Heart size={iconSize} className="fill-red-500 text-red-500" />
                     </motion.div>
                 )}
             </AnimatePresence>

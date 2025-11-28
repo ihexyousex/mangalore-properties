@@ -38,7 +38,7 @@ export default function PropertyCard({ project }: PropertyCardProps) {
         <div className="glass-panel rounded-2xl overflow-hidden group hover:border-gold/30 transition-all duration-300 flex flex-col relative">
             {/* Favorite Button */}
             <div className="absolute top-4 right-4 z-20">
-                <FavoriteButton propertyId={project.id} propertyType={project.type} />
+                <FavoriteButton propertyId={String(project.id)} />
             </div>
 
             <Link href={`/projects/${project.id}`} className="flex flex-col h-full">
