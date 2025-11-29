@@ -49,7 +49,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     // Sync with Supabase Auth (e.g. if logged in as Admin)
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session) => {
             if (session?.user) {
                 // If Supabase has a user, sync it to our local user state if not already set
                 const supabaseUser = {
