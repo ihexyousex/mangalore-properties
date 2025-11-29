@@ -1,111 +1,135 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import { useUser } from "@/components/UserProvider";
-import PropertyCard from "@/components/PropertyCard";
-import { supabase } from "@/lib/supabaseClient";
-import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, User, Heart, FileText, MessageSquare, Settings } from "lucide-react";
+import ProfileHeader from "./components/ProfileHeader";
+import OverviewTab from "./components/OverviewTab";
+import MySubmissions from "./components/MySubmissions";
+import SavedProperties from "./components/SavedProperties";
+import MyInquiries from "./components/MyInquiries";
+import SettingsTab from "./components/SettingsTab";
+
+type TabType = 'overview' | 'submissions' | 'saved' | 'inquiries' | 'settings';
+
+interface UserProfile {
+    id: string;
+    email: string;
+    full_name: string;
+    phone: string;
+    avatar_url: string;
+    bio: string;
+    location: string;
+    email_notifications: boolean;
+    whatsapp_notifications: boolean;
+    stats: {
+        total_submissions: number;
+        approved_submissions: number;
+        pending_submissions: number;
+        rejected_submissions: number;
+        total_favorites: number;
+        total_inquiries: number;
+    };
+}
 
 export default function ProfilePage() {
-    const { user, favorites, logout } = useUser();
+    const { user, openLoginModal } = useUser();
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
-    const [savedProperties, setSavedProperties] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<TabType>('overview');
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Protect route
+        // Redirect if not logged in
         if (!user) {
-            router.push("/");
+            openLoginModal();
+            router.push('/');
             return;
         }
 
-        // Match favorites with local data
-        const loadFavorites = async () => {
-            setIsLoading(true);
-            if (favorites.length === 0) {
-                setSavedProperties([]);
-                setIsLoading(false);
-                return;
-            }
+        fetchProfile();
+    }, [user]);
 
-            const ids = favorites.map(f => f.id);
-            const { data, error } = await supabase
-                .from('projects')
-                .select('*')
-                .in('id', ids);
-
-            if (error) {
-                console.error("Error fetching favorites:", error);
-            } else {
-                setSavedProperties(data || []);
-            }
-            setIsLoading(false);
-        };
-
-        if (user) {
-            loadFavorites();
+    const fetchProfile = async () => {
+        try {
+            const res = await fetch('/api/user/profile');
+            if (!res.ok) throw new Error('Failed to fetch profile');
+            const data = await res.json();
+            setProfile(data);
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        } finally {
+            setLoading(false);
         }
-    }, [user, favorites, router]);
-
-    const handleLogout = () => {
-        logout();
-        router.push("/");
     };
 
-    if (!user) return null;
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-yellow-500" />
+            </div>
+        );
+    }
+
+    if (!profile) {
+        return (
+            <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">
+                <p>Failed to load profile</p>
+            </div>
+        );
+    }
+
+    const tabs = [
+        { id: 'overview', label: 'Overview', icon: User },
+        { id: 'submissions', label: 'My Submissions', icon: FileText },
+        { id: 'saved', label: 'Saved Properties', icon: Heart },
+        { id: 'inquiries', label: 'Inquiries', icon: MessageSquare },
+        { id: 'settings', label: 'Settings', icon: Settings },
+    ] as const;
 
     return (
-        <main className="min-h-screen bg-dark-bg text-white pt-24 pb-20">
-            <div className="container mx-auto px-4">
-                {/* Header */}
-                <div className="flex justify-between items-end mb-12 border-b border-white/10 pb-6">
-                    <div>
-                        <h1 className="text-4xl font-serif font-bold text-white mb-2">
-                            My <span className="text-gold">Profile</span>
-                        </h1>
-                        <p className="text-white/60">
-                            Welcome back, {user.name || "User"}
-                        </p>
+        <div className="min-h-screen bg-neutral-950 text-white pt-24 pb-12 px-4">
+            <div className="max-w-6xl mx-auto">
+                {/* Profile Header */}
+                <ProfileHeader profile={profile} onUpdate={fetchProfile} />
+
+                {/* Tabs */}
+                <div className="mt-8 border-b border-white/10">
+                    <div className="flex gap-1 overflow-x-auto">
+                        {tabs.map((tab) => {
+                            const Icon = tab.icon;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`
+                    flex items-center gap-2 px-6 py-3 font-medium transition-all whitespace-nowrap
+                    ${activeTab === tab.id
+                                            ? 'text-yellow-500 border-b-2 border-yellow-500'
+                                            : 'text-white/60 hover:text-white hover:bg-white/5'
+                                        }
+                  `}
+                                >
+                                    <Icon className="w-4 h-4" />
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
                     </div>
-                    <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 text-sm font-bold text-white/60 hover:text-red-400 transition-colors px-4 py-2 rounded-lg hover:bg-white/5"
-                    >
-                        <LogOut size={18} />
-                        Sign Out
-                    </button>
                 </div>
 
-                {isLoading ? (
-                    <div className="text-center py-20">
-                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold mx-auto mb-4"></div>
-                        <p className="text-white/50">Loading your collection...</p>
-                    </div>
-                ) : savedProperties.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {savedProperties.map((property) => (
-                            <PropertyCard key={property.id} project={property} />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/10">
-                        <h2 className="text-2xl font-serif font-bold text-white mb-4">
-                            You haven&apos;t saved any properties yet.
-                        </h2>
-                        <p className="text-white/60 mb-8 max-w-md mx-auto">
-                            Start building your dream collection by browsing our exclusive properties.
-                        </p>
-                        <Link
-                            href="/projects"
-                            className="inline-block bg-gold text-dark-bg font-bold py-3 px-8 rounded-xl hover:bg-yellow-500 transition-colors"
-                        >
-                            Browse Projects
-                        </Link>
-                    </div>
-                )}
+                {/* Tab Content */}
+                <div className="mt-8">
+                    {activeTab === 'overview' && <OverviewTab profile={profile} />}
+                    {activeTab === 'submissions' && <MySubmissions />}
+                    {activeTab === 'saved' && <SavedProperties />}
+                    {activeTab === 'inquiries' && <MyInquiries />}
+                    {activeTab === 'settings' && (
+                        <SettingsTab profile={profile} onUpdate={fetchProfile} />
+                    )}
+                </div>
             </div>
-        </main>
+        </div>
     );
 }

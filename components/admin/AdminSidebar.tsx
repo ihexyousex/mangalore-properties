@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { LayoutDashboard, Building, Users, Search, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Building, Users, Search, Settings, LogOut, CheckCircle } from "lucide-react";
 import clsx from "clsx";
 
 const menuItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    { name: "Approvals", href: "/admin/approvals", icon: CheckCircle },
     { name: "Properties", href: "/admin/projects", icon: Building },
-    { name: "Builders", href: "/admin/builders", icon: Building }, // Reusing Building icon or use HardHat if available
+    { name: "Builders", href: "/admin/builders", icon: Building },
     { name: "Leads", href: "/admin/leads", icon: Users },
     { name: "SEO Tools", href: "/admin/seo", icon: Search },
     { name: "Settings", href: "/admin/settings", icon: Settings },
@@ -19,11 +20,25 @@ export default function AdminSidebar() {
     const pathname = usePathname();
     const [role, setRole] = useState<string | null>(null);
     const [name, setName] = useState<string | null>(null);
+    const [pendingCount, setPendingCount] = useState(0);
 
     useEffect(() => {
         setRole(localStorage.getItem("admin_role"));
         setName(localStorage.getItem("admin_name"));
+        fetchPendingCount();
     }, []);
+
+    const fetchPendingCount = async () => {
+        try {
+            const res = await fetch('/api/admin/approvals?status=pending');
+            if (res.ok) {
+                const data = await res.json();
+                setPendingCount(data.submissions.length);
+            }
+        } catch (error) {
+            console.error('Failed to fetch pending count');
+        }
+    };
 
     const handleLogout = () => {
         localStorage.removeItem("admin_auth");
@@ -62,14 +77,21 @@ export default function AdminSidebar() {
                             key={item.name}
                             href={item.href}
                             className={clsx(
-                                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
+                                "flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
                                 isActive
                                     ? "bg-gold text-black shadow-[0_0_15px_rgba(245,158,11,0.2)]"
                                     : "text-white/60 hover:bg-white/5 hover:text-white"
                             )}
                         >
-                            <Icon size={18} />
-                            {item.name}
+                            <div className="flex items-center gap-3">
+                                <Icon size={18} />
+                                {item.name}
+                            </div>
+                            {item.name === "Approvals" && pendingCount > 0 && (
+                                <span className="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                                    {pendingCount}
+                                </span>
+                            )}
                         </Link>
                     );
                 })}

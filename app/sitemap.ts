@@ -1,32 +1,52 @@
-import { MetadataRoute } from "next";
-import { PROJECTS } from "@/lib/data";
+import { MetadataRoute } from 'next';
+import { createClient } from '@supabase/supabase-js';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = "https://mangaloreproperties.in";
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-    // Static routes
-    const routes = [
-        "",
-        "/projects",
-        "/commercial",
-        "/resale",
-        "/lands",
-        "/contact",
-        "/partners",
-    ].map((route) => ({
-        url: `${baseUrl}${route}`,
-        lastModified: new Date(),
-        changeFrequency: "daily" as const,
-        priority: route === "" ? 1 : 0.8,
-    }));
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://kudlahomes.com';
 
-    // Dynamic routes for Projects
-    const projectRoutes = PROJECTS.map((project) => ({
+    // Fetch all approved projects
+    const { data: projects } = await supabase
+        .from('projects')
+        .select('id, updated_at')
+        .eq('is_approved', true);
+
+    const projectUrls = (projects || []).map((project) => ({
         url: `${baseUrl}/projects/${project.id}`,
-        lastModified: new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.9,
+        lastModified: new Date(project.updated_at || new Date()),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
     }));
 
-    return [...routes, ...projectRoutes];
+    return [
+        {
+            url: baseUrl,
+            lastModified: new Date(),
+            changeFrequency: 'daily',
+            priority: 1,
+        },
+        {
+            url: `${baseUrl}/about`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.5,
+        },
+        {
+            url: `${baseUrl}/contact`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.5,
+        },
+        {
+            url: `${baseUrl}/list-property`,
+            lastModified: new Date(),
+            changeFrequency: 'monthly',
+            priority: 0.7,
+        },
+        ...projectUrls,
+    ];
 }

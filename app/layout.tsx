@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import MobileMenu from "@/components/MobileMenu";
 import { Toaster } from "sonner";
 import GoogleOneTap from "@/components/GoogleOneTap";
+import MobileBottomNav from "@/components/MobileBottomNav"; // Added import
+import Analytics from "@/components/Analytics";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -22,8 +24,21 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Kudla Homes | Luxury Real Estate, Plots & Gated Communities",
-  description: "Discover exclusive properties in Mangalore. From luxury apartments in Kadri to premium plots in Derebail & Moodbidri. Your trusted guide for RERA-approved real estate investments.",
+  title: "Kudla Homes | Premium Real Estate in Mangalore",
+  description: "Find your dream home in Mangalore with Kudla Homes. The most trusted platform for buying, selling, and renting properties.",
+  manifest: "/manifest.json",
+  themeColor: "#D4AF37",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false, // App-like feel
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Kudla Homes",
+  },
   keywords: ["Mangalore real estate", "luxury apartments Mangalore", "plots for sale in Mangalore", "gated community Mangalore", "commercial property Mangalore", "best builders Mangalore", "RERA approved projects"],
   openGraph: {
     title: "Kudla Homes | Luxury Real Estate",
@@ -78,6 +93,7 @@ export default function RootLayout({
         <UserProvider>
           <Navbar />
           {children}
+          <MobileBottomNav />
           <LoginModal />
           <CompareBar />
           <WhatsAppWidget />

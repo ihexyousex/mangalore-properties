@@ -10,9 +10,9 @@ import ProjectActions from "@/components/ProjectActions";
 import FloorPlanSection from "@/components/FloorPlanSection";
 import AmenitiesSection from "@/components/AmenitiesSection";
 import ProjectInquiryForm from "@/components/ProjectInquiryForm";
-import EmiCalculator from "@/components/EmiCalculator";
 import { getDistancesFromLandmarks } from "@/lib/ors";
 import DistanceDisplay from "@/components/DistanceDisplay";
+import EmiCalculator from "@/components/EmiCalculator";
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -73,8 +73,39 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
     const numericPrice = parsePrice(project.price);
 
+    // JSON-LD Structured Data
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "RealEstateListing",
+        "name": project.name,
+        "description": project.description,
+        "image": project.cover_image_url ? [project.cover_image_url] : [],
+        "url": `${process.env.NEXT_PUBLIC_SITE_URL}/projects/${project.id}`,
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": project.location,
+            "addressRegion": "Karnataka",
+            "addressCountry": "IN"
+        },
+        "geo": project.latitude && project.longitude ? {
+            "@type": "GeoCoordinates",
+            "latitude": project.latitude,
+            "longitude": project.longitude
+        } : undefined,
+        "offers": {
+            "@type": "Offer",
+            "price": numericPrice,
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock"
+        }
+    };
+
     return (
         <main className="min-h-screen bg-dark-bg text-white pb-24 md:pb-0">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             {/* Floating Back Button */}
             <Link
                 href="/projects"
@@ -85,6 +116,14 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
             {/* Hero Section */}
             <section className="relative h-[60vh] w-full">
+                <Image
+                    src={project.cover_image_url || BLUR_DATA_URL}
+                    alt={project.name}
+                    fill
+                    priority
+                    className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 w-full p-6 md:p-12">
                     <div className="container mx-auto flex justify-between items-end">
@@ -270,6 +309,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
                                 style={{ border: 0 }}
                                 src={project.map_url || `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${encodeURIComponent(project.location)}`}
                                 allowFullScreen
+                                loading="lazy"
                                 className="filter grayscale-[20%] hover:grayscale-0 transition-all duration-700"
                             ></iframe>
                             <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur-md px-4 py-2 rounded-lg border border-gold/30">

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendSubmissionConfirmation, sendAdminNotification } from '@/lib/email/notifications';
 
-const supabase = createClient(
+const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
@@ -26,19 +26,35 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Insert listing into database with is_approved = false
-        const { data, error } = await supabase
+        // Get authenticated user from request headers (if logged in)
+        const authHeader = request.headers.get('authorization');
+        let userId: string | null = null;
+
+        if (authHeader) {
+            try {
+                const token = authHeader.replace('Bearer ', '');
+                const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+                userId = user?.id || null;
+            } catch {
+                // Not logged in, continue without user ID
+            }
+        }
+
+        // Insert listing into database with approval_status = 'pending'
+        const { data, error } = await supabaseAdmin
             .from('projects')
             .insert({
                 name: listing.title,
                 price: listing.price,
                 location: listing.location,
                 listing_type: listing.listingType,
-                is_approved: false,
-                submitted_by: submitter.email,
+                approval_status: 'pending', // New schema field
+                submitted_by: userId, // Link to user if logged in
+                submitted_at: new Date().toISOString(), // New schema field
                 property_meta: {
                     submitter_name: submitter.name,
                     submitter_phone: submitter.phone,
+                    submitter_email: submitter.email,
                     ...listing,
                 },
                 // Map other fields
@@ -48,6 +64,8 @@ export async function POST(request: NextRequest) {
                 area: listing.area,
                 landmarks: listing.landmarks,
                 map_url: listing.mapUrl,
+                description: listing.description,
+                amenities: listing.amenities ? listing.amenities.split(',').map((a: string) => a.trim()) : [],
             })
             .select()
             .single();
@@ -79,7 +97,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             success: true,
             trackingId,
-            message: 'Listing submitted successfully',
+            message: 'Listing submitted successfully. Your property will be reviewed by our team.',
         });
 
     } catch (error: any) {

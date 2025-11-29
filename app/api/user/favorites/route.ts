@@ -1,66 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
+const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-export async function POST(request: NextRequest) {
-    try {
-        const { userId, propertyId } = await request.json();
+async function getUser(request: NextRequest) {
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+        const token = authHeader.replace('Bearer ', '');
+        const { data } = await supabaseAdmin.auth.getUser(token);
+        return data.user;
+    }
+    return null;
+}
 
-        if (!userId || !propertyId) {
+export async function GET(request: NextRequest) {
+    try {
+        const user = await getUser(request);
+
+        if (!user) {
             return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
+                { error: 'Unauthorized' },
+                { status: 401 }
             );
         }
 
-        // Get current favorites
-        const { data: prefs, error: fetchError } = await supabase
-            .from('user_preferences')
-            .select('favorite_properties')
-            .eq('user_id', userId)
-            .single();
+        // Fetch favorites with project details
+        const { data: favorites, error: favoritesError } = await supabaseAdmin
+            .from('favorites')
+            .select(`
+        id,
+        created_at,
+        project:project_id (
+          id,
+          title,
+          location,
+          price,
+          cover_image_url,
+          type,
+          category
+        )
+      `)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
 
-        if (fetchError) {
-            // If no preferences exist, create them
-            if (fetchError.code === 'PGRST116') {
-                await supabase.from('user_preferences').insert({
-                    user_id: userId,
-                    favorite_properties: [propertyId],
-                });
-                return NextResponse.json({ isFavorite: true });
-            }
-            throw fetchError;
+        if (favoritesError) {
+            return NextResponse.json(
+                { error: 'Failed to fetch favorites' },
+                { status: 500 }
+            );
         }
 
-        let favorites = prefs.favorite_properties || [];
-        let isFavorite = false;
+        return NextResponse.json({
+            favorites: favorites || []
+        });
 
-        if (favorites.includes(propertyId)) {
-            // Remove from favorites
-            favorites = favorites.filter((id: string) => id !== propertyId);
-            isFavorite = false;
-        } else {
-            // Add to favorites
-            favorites.push(propertyId);
-            isFavorite = true;
-        }
-
-        // Update database
-        const { error: updateError } = await supabase
-            .from('user_preferences')
-            .update({ favorite_properties: favorites })
-            .eq('user_id', userId);
-
-        if (updateError) throw updateError;
-
-        return NextResponse.json({ isFavorite, favorites });
-
-    } catch (error: any) {
-        console.error('Favorites error:', error);
+    } catch (error) {
+        console.error('Error fetching favorites:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -68,26 +66,68 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     try {
-        const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
+        const user = await getUser(request);
 
-        if (!userId) {
-            return NextResponse.json({ favorites: [] });
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Unauthorized' },
+                { status: 401 }
+            );
         }
 
-        const { data: prefs } = await supabase
-            .from('user_preferences')
-            .select('favorite_properties')
-            .eq('user_id', userId)
+        const { project_id } = await request.json();
+
+        if (!project_id) {
+            return NextResponse.json(
+                { error: 'Project ID is required' },
+                { status: 400 }
+            );
+        }
+
+        // Check if already favorited
+        const { data: existing } = await supabaseAdmin
+            .from('favorites')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('project_id', project_id)
             .single();
 
+        if (existing) {
+            return NextResponse.json(
+                { error: 'Already in favorites' },
+                { status: 400 }
+            );
+        }
+
+        // Add to favorites
+        const { data, error } = await supabaseAdmin
+            .from('favorites')
+            .insert({
+                user_id: user.id,
+                project_id
+            })
+            .select()
+            .single();
+
+        if (error) {
+            return NextResponse.json(
+                { error: 'Failed to add favorite' },
+                { status: 500 }
+            );
+        }
+
         return NextResponse.json({
-            favorites: prefs?.favorite_properties || []
+            success: true,
+            favorite: data
         });
 
     } catch (error) {
-        return NextResponse.json({ favorites: [] });
+        console.error('Error adding favorite:', error);
+        return NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
     }
 }
