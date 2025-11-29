@@ -129,6 +129,15 @@ export default function AdminLoginPage() {
                         Secure authentication via Supabase Auth<br />
                         Admin credentials required
                     </p>
+                    <button
+                        onClick={async () => {
+                            await supabase.auth.signOut();
+                            window.location.reload();
+                        }}
+                        className="mt-4 text-xs text-red-400 hover:text-red-300 underline"
+                    >
+                        Clear Session / Logout
+                    </button>
                 </div>
             </div>
         </main>

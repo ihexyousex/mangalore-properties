@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/components/UserProvider";
+import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import { Loader2, User, Heart, FileText, MessageSquare, Settings } from "lucide-react";
 import ProfileHeader from "./components/ProfileHeader";
@@ -53,7 +54,18 @@ export default function ProfilePage() {
 
     const fetchProfile = async () => {
         try {
-            const res = await fetch('/api/user/profile');
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                throw new Error('No session found');
+            }
+
+            const res = await fetch('/api/user/profile', {
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            });
+
             if (!res.ok) throw new Error('Failed to fetch profile');
             const data = await res.json();
             setProfile(data);
