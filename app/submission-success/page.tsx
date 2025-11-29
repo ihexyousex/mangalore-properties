@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function SubmissionSuccessPage() {
+function SubmissionSuccessContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const trackingId = searchParams.get("id");
@@ -45,7 +45,7 @@ export default function SubmissionSuccessPage() {
 
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-6 mb-8">
                     <p className="text-yellow-500 text-lg font-medium mb-2">
-                        📋 Your Tracking ID
+                        ðŸ“‹ Your Tracking ID
                     </p>
                     <p className="text-3xl font-bold text-yellow-500 font-mono">
                         #{trackingId}
@@ -54,13 +54,13 @@ export default function SubmissionSuccessPage() {
 
                 <div className="space-y-4 text-white/70">
                     <p className="text-lg">
-                        ✅ Your listing is under review
+                        âœ… Your listing is under review
                     </p>
                     <p className="text-lg">
-                        📧 Check your email for confirmation
+                        ðŸ“§ Check your email for confirmation
                     </p>
                     <p className="text-lg">
-                        ⏱️ We'll review within 24 hours
+                        â±ï¸ We'll review within 24 hours
                     </p>
                 </div>
 
@@ -85,5 +85,17 @@ export default function SubmissionSuccessPage() {
                 </p>
             </motion.div>
         </div>
+    );
+}
+
+export default function SubmissionSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">
+                Loading...
+            </div>
+        }>
+            <SubmissionSuccessContent />
+        </Suspense>
     );
 }
