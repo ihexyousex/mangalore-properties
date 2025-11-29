@@ -47,6 +47,23 @@ export function UserProvider({ children }: { children: ReactNode }) {
         }
     }, [user]);
 
+    // Sync with Supabase Auth (e.g. if logged in as Admin)
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                // If Supabase has a user, sync it to our local user state if not already set
+                const supabaseUser = {
+                    name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || "Admin User",
+                    phone: session.user.phone || session.user.user_metadata?.phone || "Admin"
+                };
+                // Only set if we don't have a user or if it's different
+                setUser(prev => prev ? prev : supabaseUser);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
     // Fetch favorites when user logs in
     useEffect(() => {
         const fetchFavorites = async () => {
