@@ -4,12 +4,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, PlusCircle, Heart, User } from "lucide-react";
 import clsx from "clsx";
+import { useUser } from "./UserProvider";
 
 export default function MobileBottomNav() {
     const pathname = usePathname();
+    const { user } = useUser();
 
-    // Hide on admin pages
-    if (pathname?.startsWith("/admin")) return null;
+    // Hide on admin pages or if user is not logged in
+    if (pathname?.startsWith("/admin") || !user) return null;
 
     const navItems = [
         { name: "Home", href: "/", icon: Home },
