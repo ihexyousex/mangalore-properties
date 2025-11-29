@@ -1,0 +1,116 @@
+3:57:09 PM: build-image version: cc7730f6f332688234781c0852e824dedc2337ca (noble)
+3:57:09 PM: buildbot version: cc7730f6f332688234781c0852e824dedc2337ca
+3:57:09 PM: Fetching cached dependencies
+3:57:09 PM: Failed to fetch cache, continuing with build
+3:57:09 PM: Starting to prepare the repo for build
+3:57:09 PM: No cached dependencies found. Cloning fresh repo
+3:57:09 PM: git clone --filter=blob:none https://github.com/ihexyousex/mangalore-properties
+3:57:10 PM: Preparing Git Reference refs/heads/main
+3:57:11 PM: Starting to install dependencies
+3:57:12 PM: v22.21.1 is already installed.
+3:57:12 PM: Now using node v22.21.1 (npm v10.9.4)
+3:57:12 PM: Enabling Node.js Corepack
+3:57:12 PM: Started restoring cached build plugins
+3:57:12 PM: Finished restoring cached build plugins
+3:57:12 PM: Started restoring cached corepack dependencies
+3:57:12 PM: Finished restoring cached corepack dependencies
+3:57:12 PM: No npm workspaces detected
+3:57:12 PM: Started restoring cached node modules
+3:57:12 PM: Finished restoring cached node modules
+3:57:12 PM: Installing npm packages using npm version 10.9.4
+3:57:21 PM: added 423 packages in 9s
+3:57:21 PM: npm packages installed
+3:57:22 PM: Successfully installed dependencies
+3:57:22 PM: Starting build script
+3:57:23 PM: Detected 1 framework(s)
+3:57:23 PM: "next" at version "16.0.4"
+3:57:23 PM: Section completed: initializing
+3:57:24 PM: ​
+3:57:24 PM: Netlify Build                                                 
+3:57:24 PM: ────────────────────────────────────────────────────────────────
+3:57:24 PM: ​
+3:57:24 PM: ❯ Version
+3:57:24 PM:   @netlify/build 35.5.2
+3:57:24 PM: ​
+3:57:24 PM: ❯ Flags
+3:57:24 PM:   accountId: 692abb8850fe966f728546ad
+3:57:24 PM:   baseRelDir: true
+3:57:24 PM:   buildId: 692aca7b4db8820008549c58
+3:57:24 PM:   deployId: 692aca7b4db8820008549c5a
+3:57:24 PM: ​
+3:57:24 PM: ❯ Current directory
+3:57:24 PM:   /opt/build/repo
+3:57:24 PM: ​
+3:57:24 PM: ❯ Config file
+3:57:24 PM:   /opt/build/repo/netlify.toml
+3:57:24 PM: ​
+3:57:24 PM: ❯ Context
+3:57:24 PM:   production
+3:57:25 PM: ​
+3:57:25 PM: ❯ Using Next.js Runtime - v5.14.7
+3:57:26 PM: No Next.js cache to restore
+3:57:26 PM: ​
+3:57:26 PM: build.command from netlify.toml                               
+3:57:26 PM: ────────────────────────────────────────────────────────────────
+3:57:26 PM: ​
+3:57:26 PM: $ npm run build
+3:57:26 PM: > mangalore-properties@0.1.0 build
+3:57:26 PM: > next build
+3:57:26 PM: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+3:57:26 PM: ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+3:57:26 PM:    ▲ Next.js 16.0.4 (Turbopack)
+3:57:26 PM:  ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+3:57:26 PM:    Creating an optimized production build ...
+3:57:26 PM: [baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+3:57:37 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
+3:57:36 PM: > Build error occurred
+3:57:36 PM: Error: Turbopack build failed with 1 errors:
+3:57:36 PM: ./lib/email/notifications.ts:1:6
+3:57:36 PM: Parsing ecmascript source code failed
+3:57:36 PM: > 1 | Make Resend email service optional
+3:57:36 PM:     |      ^^^^^^
+3:57:36 PM:   2 | https://app.netlify.com/projects/kudlahomes/deploys/692ac4f200bb0ec687e34107
+3:57:36 PM:   3 |
+3:57:36 PM: Expected ';', '}' or <eof>
+3:57:36 PM: Import trace:
+3:57:36 PM:   App Route:
+3:57:36 PM:     ./lib/email/notifications.ts
+3:57:36 PM:     ./app/api/admin/approvals/[id]/route.ts
+3:57:36 PM:     at <unknown> (./lib/email/notifications.ts:1:6)
+3:57:36 PM: ​
+3:57:36 PM: "build.command" failed                                        
+3:57:36 PM: ────────────────────────────────────────────────────────────────
+3:57:36 PM: ​
+3:57:36 PM:   Error message
+3:57:36 PM:   Command failed with exit code 1: npm run build (https://ntl.fyi/exit-code-1)
+3:57:36 PM: ​
+3:57:36 PM:   Error location
+3:57:36 PM:   In build.command from netlify.toml:
+3:57:36 PM:   npm run build
+3:57:36 PM: ​
+3:57:36 PM:   Resolved config
+3:57:36 PM:   build:
+3:57:36 PM:     command: npm run build
+3:57:36 PM:     commandOrigin: config
+3:57:36 PM:     environment:
+3:57:36 PM:       - DATABASE_URL
+3:57:36 PM:       - GEMINI_API_KEY
+3:57:36 PM:       - GOOGLE_API_KEY
+3:57:36 PM:       - GOOGLE_CLIENT_SECRET
+3:57:36 PM:       - NEXT_PUBLIC_GOOGLE_CLIENT_ID
+3:57:36 PM:       - NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+3:57:36 PM:       - NEXT_PUBLIC_IMAGEKIT_URL
+3:57:36 PM:       - NEXT_PUBLIC_SUPABASE_ANON_KEY
+3:57:36 PM:       - NEXT_PUBLIC_SUPABASE_URL
+3:57:36 PM:       - ORS_API_KEY
+3:57:36 PM:       - SUPABASE_SERVICE_ROLE_KEY
+3:57:36 PM:     publish: /opt/build/repo/.next
+3:57:36 PM:     publishOrigin: config
+3:57:36 PM:   plugins:
+3:57:36 PM:     - inputs: {}
+3:57:36 PM:       origin: config
+3:57:36 PM:       package: "@netlify/plugin-nextjs"
+3:57:37 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+3:57:37 PM: Failing build: Failed to build site
+3:57:37 PM: Finished processing build request in 27.812sake Resend email service optional
+https://app.netlify.com/projects/kudlahomes/deploys/692ac4f200bb0ec687e34107

@@ -1,0 +1,65 @@
+import { createServerClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function middleware(req: NextRequest) {
+    const res = NextResponse.next();
+
+    // Create Supabase client for middleware
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+            cookies: {
+                get(name: string) {
+                    return req.cookies.get(name)?.value;
+                },
+                set(name: string, value: string, options: any) {
+                    res.cookies.set({
+                        name,
+                        value,
+                        ...options,
+                    });
+                },
+                remove(name: string, options: any) {
+                    res.cookies.set({
+                        name,
+                        value: '',
+                        ...options,
+                    });
+                },
+            },
+        }
+    );
+
+    const {
+        data: { session },
+    } = await supabase.auth.getSession();
+
+    // Protect /admin routes (except login page)
+    if (req.nextUrl.pathname.startsWith('/admin')) {
+        // Allow access to login page
+        if (req.nextUrl.pathname === '/admin/login') {
+            return res;
+        }
+
+        // Redirect to login if no session
+        if (!session) {
+            const redirectUrl = new URL('/admin/login', req.url);
+            return NextResponse.redirect(redirectUrl);
+        }
+
+        // Check if user is admin
+        const userRole = session.user.user_metadata?.role;
+        if (userRole !== 'admin') {
+            const redirectUrl = new URL('/admin/login', req.url);
+            return NextResponse.redirect(redirectUrl);
+        }
+    }
+
+    return res;
+}
+
+export const config = {
+    matcher: '/admin/:path*',
+};
