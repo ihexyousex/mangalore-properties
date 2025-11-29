@@ -1,8 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
 
-import HeroSearch from "@/components/HeroSearch";
+import HeroVideo from "@/components/HeroVideo";
 import SeoFaq from "@/components/SeoFaq";
 import { supabase } from "@/lib/supabaseClient";
 import PropertyCard from "@/components/PropertyCard";
@@ -85,39 +83,7 @@ export default async function Home({
   return (
     <main className="min-h-screen bg-dark-bg text-white">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] w-full flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2000"
-            alt="Luxury Coastal Home"
-            fill
-            sizes="100vw"
-            className="object-cover"
-            priority
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#050505]" />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 text-center px-4 w-full">
-          <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight mb-6 animate-fade-in-up">
-            Your Gateway to <br />
-            <span className="text-gold italic">Coastal Luxury</span>
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto font-sans mb-8">
-            Discover exclusive properties in Mangalore's most prestigious locations.
-          </p>
-
-          <HeroSearch />
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-          <ChevronDown className="text-white/50 w-8 h-8" />
-        </div>
-      </section>
+      <HeroVideo />
 
       {/* Bento Grid Section */}
       <section className="container mx-auto px-4 py-12">
