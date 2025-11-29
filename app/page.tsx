@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import HeroVideo from "@/components/HeroVideo";
 import SeoFaq from "@/components/SeoFaq";
