@@ -38,8 +38,12 @@ export async function middleware(req: NextRequest) {
 
     // Protect /admin routes (except login page)
     if (req.nextUrl.pathname.startsWith('/admin')) {
-        // Allow access to login page
+        // Allow access to login page, but redirect if already logged in
         if (req.nextUrl.pathname === '/admin/login') {
+            if (session && session.user.user_metadata?.role === 'admin') {
+                const redirectUrl = new URL('/admin/dashboard', req.url);
+                return NextResponse.redirect(redirectUrl);
+            }
             return res;
         }
 

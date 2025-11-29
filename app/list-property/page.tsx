@@ -1,7 +1,7 @@
 "use client";
 
-import PublicListingForm from "@/components/public/PublicListingForm";
+import PublicListingWizard from "@/components/public/PublicListingWizard";
 
 export default function ListPropertyPage() {
-    return <PublicListingForm />;
+    return <PublicListingWizard />;
 }
