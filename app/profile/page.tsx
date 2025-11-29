@@ -74,8 +74,15 @@ export default function ProfilePage() {
 
     if (!profile) {
         return (
-            <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white">
-                <p>Failed to load profile</p>
+            <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white gap-4">
+                <p className="text-red-500 text-xl">Failed to load profile</p>
+                <p className="text-white/50 text-sm">Please try logging in again.</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                    Retry
+                </button>
             </div>
         );
     }

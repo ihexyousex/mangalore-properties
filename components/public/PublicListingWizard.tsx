@@ -36,10 +36,14 @@ export default function PublicListingWizard() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
 
-    const { isLoaded: mapsLoaded } = useLoadScript({
+    const { isLoaded: mapsLoaded, loadError } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string,
         libraries: MAPS_LIBRARIES,
     });
+
+    if (loadError) {
+        return <div className="text-red-500 text-center p-4">Error loading Google Maps</div>;
+    }
 
     const getStepSchema = () => {
         if (currentStep === 5) return contactSchema;
