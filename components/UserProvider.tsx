@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { Session } from "@supabase/supabase-js";
 
 type User = {
     name?: string;
@@ -49,7 +50,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
     // Sync with Supabase Auth (e.g. if logged in as Admin)
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string, session: Session | null) => {
             if (session?.user) {
                 // If Supabase has a user, sync it to our local user state if not already set
                 const supabaseUser = {
