@@ -91,7 +91,7 @@ export default function ResalePage() {
 
                                 {/* Favorite Button */}
                                 <div className="absolute top-4 right-4 z-20">
-                                    <FavoriteButton propertyId={property.id} propertyType="Resale" />
+                                    <FavoriteButton propertyId={property.id} />
                                 </div>
                             </div>
 

@@ -186,7 +186,7 @@ export default function CommercialPage() {
                                                     <Square className="w-5 h-5" />
                                                 )}
                                             </button>
-                                            <FavoriteButton propertyId={property.id} propertyType="Commercial" />
+                                            <FavoriteButton propertyId={property.id} />
                                         </div>
                                     </div>
                                 </div>

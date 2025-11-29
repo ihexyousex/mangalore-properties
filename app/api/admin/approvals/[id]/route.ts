@@ -9,11 +9,11 @@ const supabase = createClient(
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const { action, message } = await request.json();
-        const { id } = params;
+        const { id } = await params;
 
         if (action === 'approve') {
             // Approve listing
@@ -41,13 +41,22 @@ export async function PATCH(
             return NextResponse.json({ success: true, listing: data });
 
         } else if (action === 'reject') {
+            // First fetch the existing project to get property_meta
+            const { data: existingProject, error: fetchError } = await supabase
+                .from('projects')
+                .select('property_meta, submitted_by, name')
+                .eq('id', id)
+                .single();
+
+            if (fetchError) throw fetchError;
+
             // Keep listing but mark as rejected (soft delete)
             const { data, error } = await supabase
                 .from('projects')
                 .update({
                     is_approved: false,
                     property_meta: {
-                        ...data.property_meta,
+                        ...existingProject.property_meta,
                         rejected: true,
                         rejection_reason: message,
                     },
