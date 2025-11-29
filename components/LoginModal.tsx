@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Phone, ArrowRight } from "lucide-react";
 import { useUser } from "./UserProvider";
+import Link from "next/link";
 
 export default function LoginModal() {
     const { isLoginModalOpen, closeLoginModal, login } = useUser();
@@ -158,6 +159,12 @@ export default function LoginModal() {
                             </button>
                         </form>
                     )}
+                </div>
+
+                <div className="mt-6 text-center">
+                    <Link href="/admin/login" className="text-xs text-white/30 hover:text-white/60 transition-colors">
+                        Admin Access
+                    </Link>
                 </div>
             </div>
         </div>
