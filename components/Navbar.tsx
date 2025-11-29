@@ -25,10 +25,10 @@ export default function Navbar() {
             {/* Desktop Navbar */}
             <nav className="hidden md:flex fixed top-0 w-full z-50 glass-panel px-10 py-5 justify-between items-center border-b border-white/10 backdrop-blur-xl bg-black/20">
                 <Link href="/" className="flex items-center gap-3 group">
-                    <span className="font-serif text-3xl text-gold font-bold tracking-tight group-hover:text-white transition-colors duration-300">MP</span>
+                    <span className="font-serif text-3xl text-gold font-bold tracking-tight group-hover:text-white transition-colors duration-300">KH</span>
                     <div className="flex flex-col">
                         <span className="text-lg text-white font-sans tracking-wide font-medium leading-none group-hover:text-gold transition-colors duration-300">
-                            MangaloreProperties.in
+                            KudlaHomes.com
                         </span>
                         <span className="text-[10px] text-white/50 uppercase tracking-[0.2em] leading-none mt-1">
                             Luxury Real Estate
@@ -154,8 +154,8 @@ export default function Navbar() {
             {/* Mobile Navbar */}
             <nav className="md:hidden fixed top-0 w-full z-50 glass-panel px-6 py-4 flex justify-between items-center border-b border-white/10 backdrop-blur-xl bg-black/20">
                 <Link href="/" className="flex items-center gap-2">
-                    <span className="font-serif text-2xl text-gold font-bold tracking-tight">MP</span>
-                    <span className="text-sm text-white font-sans tracking-wide font-medium">MangaloreProperties.in</span>
+                    <span className="font-serif text-2xl text-gold font-bold tracking-tight">KH</span>
+                    <span className="text-sm text-white font-sans tracking-wide font-medium">KudlaHomes.com</span>
                 </Link>
                 <div className="flex items-center gap-4">
                     <button

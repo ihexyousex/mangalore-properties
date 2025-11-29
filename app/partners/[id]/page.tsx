@@ -177,7 +177,7 @@ export default function BuilderDetailPage() {
                     {/* Current Listings Grid */}
                     <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
                         <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                        Current Listings on Mangalore Properties
+                        Current Listings on Kudla Homes
                     </h3>
 
                     {projects.length > 0 ? (

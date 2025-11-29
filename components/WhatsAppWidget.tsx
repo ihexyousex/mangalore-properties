@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function WhatsAppWidget() {
     const [showTooltip, setShowTooltip] = useState(false);
     const phoneNumber = "919876543210";
-    const message = "Hi, I am interested in a property on Mangalore Properties.";
+    const message = "Hi, I am interested in a property on Kudla Homes.";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
     useEffect(() => {

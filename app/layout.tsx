@@ -22,11 +22,11 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Mangalore Properties | Luxury Real Estate, Plots & Gated Communities",
+  title: "Kudla Homes | Luxury Real Estate, Plots & Gated Communities",
   description: "Discover exclusive properties in Mangalore. From luxury apartments in Kadri to premium plots in Derebail & Moodbidri. Your trusted guide for RERA-approved real estate investments.",
   keywords: ["Mangalore real estate", "luxury apartments Mangalore", "plots for sale in Mangalore", "gated community Mangalore", "commercial property Mangalore", "best builders Mangalore", "RERA approved projects"],
   openGraph: {
-    title: "Mangalore Properties | Luxury Real Estate",
+    title: "Kudla Homes | Luxury Real Estate",
     description: "Discover exclusive properties in Mangalore. From luxury apartments in Kadri to premium plots in Derebail & Moodbidri.",
     url: "https://mangaloreproperties.in",
     siteName: "MangaloreProperties.in",

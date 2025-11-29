@@ -162,7 +162,7 @@ export default function SellPage() {
             <div className="pt-32 pb-12 container mx-auto px-4 max-w-3xl">
                 <div className="text-center mb-12">
                     <h1 className="text-4xl font-serif font-bold mb-4">List Your Property</h1>
-                    <p className="text-white/60">Fill in the details to list your property on Mangalore Properties.</p>
+                    <p className="text-white/60">Fill in the details to list your property on Kudla Homes.</p>
                 </div>
 
                 {/* Progress Bar */}

@@ -9,7 +9,7 @@ export default function Footer() {
                     {/* Brand Column */}
                     <div className="space-y-6">
                         <h2 className="text-2xl font-serif font-bold">
-                            Mangalore<span className="text-gold">Properties.in</span>
+                            Kudla<span className="text-gold">Homes.com</span>
                         </h2>
                         <p className="text-neutral-400 leading-relaxed">
                             Your Gateway to Coastal Luxury. Premium real estate consultants in Mangalore specializing in high-end residential and commercial investments.
@@ -66,7 +66,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-3 text-neutral-400">
                                 <Mail size={20} className="text-gold shrink-0" />
-                                <a href="mailto:hello@mangaloreproperties.in" className="hover:text-white transition-colors">hello@mangaloreproperties.in</a>
+                                <a href="mailto:hello@kudlahomes.com" className="hover:text-white transition-colors">hello@kudlahomes.com</a>
                             </li>
                         </ul>
                     </div>
@@ -86,7 +86,7 @@ export default function Footer() {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-neutral-500">
-                    <p>Copyright © 2025 MangaloreProperties.in. All rights reserved.</p>
+                    <p>Copyright © 2025 KudlaHomes.com. All rights reserved.</p>
                     <div className="flex gap-6">
                         <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
                         <Link href="/terms" className="hover:text-white transition-colors">Terms of Use</Link>
